@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
+            40% {transform: translateY(-20px);}
+            60% {transform: translateY(-10px);}
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background: linear-gradient(to right, #ff9966, #ff5e62);
+            font-family: Arial, sans-serif;
+        }
+
+        h2 {
+            color: #fff;
+        }
+
+        #code, #output {
+            width: 50%;
+            padding: 1em;
+            font-family: monospace;
+            margin-bottom: 1em;
+            border-radius: 5px;
+            border: none;
+        }
+
+        #code {
+            height: 150px;
+            background-color: rgba(255, 255, 255, 0.9);
+        }
+
+        #output {
+            height: 100px;
+            margin-top: 20px;
+            background-color: rgba(255, 255, 255, 0.7);
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            color: #fff;
+            background-color: #007BFF;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+            animation: bounce 1s;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Python Code Executor</h2>
+
+<textarea id="code">
+print("Hello, World!")
+</textarea>
+
+<button onclick="sendCode()">Run</button>
+
+<textarea id="output" readonly></textarea>
+
+<script>
+    async function sendCode() {
+      try {
+        const question = document.getElementById('code').value;
+        const response = await fetch('http://localhost:8000/generate', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({question}),
+        });
+
+        if (!response.ok) {
+          const message = `An error has occured: ${response.status}`;
+          throw new Error(message);
+        }
+
+        const code = await response.text();
+
+        const runResponse = await fetch('http://localhost:8000/run', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({code}),
+        });
+
+        if (!runResponse.ok) {
+          const message = `An error has occured: ${runResponse.status}`;
+          throw new Error(message);
+        }
+
+        const output = await runResponse.text();
+        document.getElementById('output').value = output;
+      } catch (error) {
+        console.log(error);
+        document.getElementById('output').value = "Error: " + error.message;
+      }
+    }
+
+</script>
+
+</body>
+</html>
