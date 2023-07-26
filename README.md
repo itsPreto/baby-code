@@ -34,38 +34,59 @@ git clone https://github.com/itsPreto/baby-interpreter
 cd baby-interpreter
 ```
 
-- Install the following libraries (_requirements.txt coming soon..._):
+- Install the required libraries:
   
 ```bash 
-pip install flask flask_cors subprocess langchain
+pip install -r requirements.txt
 ```
+
+## 💾 Model Download
+
+- With everything installed you just need a model.
+- The 7B Llama-2 based model [TheBloke/llama2-7b-chat-codeCherryPop-qLoRA-GGML](https://huggingface.co/TheBloke/llama2-7b-chat-codeCherryPop-qLoRA-GGML) is a model fine-tuned by [a kind redditor](https://www.reddit.com/r/LocalLLaMA/comments/156htzy/i_made_llama2_7b_into_a_really_useful_coder/)
+- You may also download any other models supported by llama.cpp (_llama-cpp-python_), of any parameter size of your choosing.
+- Keep in mind that the paramters might need to be tuned for your specific case:
+
+```python
+model_path=MODEL,
+n_gpu_layers=n_gpu_layers,
+n_batch=n_batch,
+n_ctx=4098,
+max_tokens=600,
+f16_kv=True,  # MUST set to True, otherwise you will run into problem after a couple of calls
+callback_manager=callback_manager,
+verbose=True,
+```
+
 ## 🧠 Model Config
-This project is configured to use LlamaCpp and load up models for local inference.
-Models can be found on HuggingFace and once downloaded you can simply place them in the `\models` folder and update the `MODEL` path variable in `main.py`.
+This project is configured to use [llama.cpp](https://github.com/ggerganov/llama.cpp) to load up models for local inference using CPU or GPU.
+Once your model is downloaded you can simply place it in the `\models` folder and update the `MODEL` path variable in `main.py`.
 ```python 
 WIZARD_LM_V2 = "WizardLM-13B-V1.2/WizardLM-13B-V1.2-GGML-q4_0.bin"
-USEFUL_CODER = "useful_coder/code-cherryLamma-2/useful-coder-ggml-q4_0.bin"
-MODEL = f"./models/{USEFUL_CODER}"
+USEFUL_CODER = "code_cherry_Llama_q4_0.bin"
+MODEL = f"models/{USEFUL_CODER}"
 ```
 ## 🏃‍♀️ Run it
-- Simply execute: 
+- To start the backend simply run: 
 ```bash 
 python main.py 
 ```
 
-The Flask server will start and listen on port 8000. The server exposes two endpoints ```/generate``` and ```/run.```
+The Flask server will start and listen on port 8000. The server exposes two endpoints `/generate` and `/run.`
 ## 🌐 Endpoints
 - `/generate`: receives a POST request with a user's question in the body. The question is processed by the LLM, and a 
 Python code snippet is generated and returned.
 
 - `/run`: receives a POST request with Python code in the body. The code is executed, and the output of the execution 
 is returned.
-## 🤝 Contributing
-  Contributions to this project are welcome. Please create a fork of the repository, make your changes, and submit a pull 
-request.
-  I'll be creating a few issues for feature tracking soon!!
 
-  
-ALSO~~~ If anyone would like to start a Discord channel and help me manage it that would be awesome _(I'm not on it that much)_.
+## 🤝 Contributing
+> Contributions to this project are welcome. Please create a fork of the repository, make your changes, and submit a pull 
+request.
+> I'll be creating a few issues for feature tracking soon!!
+> 
+> ALSO~~~ If anyone would like to start a Discord channel and help me manage it that would be awesome
+> 
+> _(I'm not on it that much)_.
 ## License
 This project is licensed under the MIT License.
