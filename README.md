@@ -45,7 +45,10 @@ USEFUL_CODER = "useful_coder/code-cherryLamma-2/useful-coder-ggml-q4_0.bin"
 MODEL = f"./models/{USEFUL_CODER}"
 ```
 ## 🏃‍♀️ Run it
-- Simply execute: ```bash python app.py ```
+- Simply execute: 
+```bash 
+python main.py 
+```
 
 The Flask server will start and listen on port 8000. The server exposes two endpoints ```/generate``` and ```/run.```
 ## 🌐 Endpoints

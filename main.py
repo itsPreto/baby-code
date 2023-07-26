@@ -13,9 +13,9 @@ CORS(app)
 
 # for some reason I'm getting extremely slow inference speeds with WizardLM-13B-V1.2
 WIZARD_LM_V2 = "WizardLM-13B-V1.2/WizardLM-13B-V1.2-GGML-q4_0.bin"
-USEFUL_CODER = "useful_coder/code-cherryLamma-2/useful-coder-ggml-q4_0.bin"
+USEFUL_CODER = "code_cherry_Llama_q4_0.bin"
 
-MODEL = f"./models/{USEFUL_CODER}"
+MODEL = f"models/{USEFUL_CODER}"
 
 def run_python_code(code):
     process = subprocess.Popen(["python3", "-c", code], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
