@@ -20,14 +20,19 @@ The service is exposed through a Flask server which receives user's requests, pr
 
 ## 🚀 Setup
 - Clone the repo:
+  
 ```bash 
 git clone https://github.com/itsPreto/baby-interpreter
 ```
+
 -  Navigate to the project:
+  
 ```bash 
 cd baby-interpreter
 ```
+
 - Install the following libraries (_requirements.txt coming soon..._):
+  
 ```bash 
 pip install flask flask_cors subprocess langchain
 ```
@@ -40,12 +45,13 @@ USEFUL_CODER = "useful_coder/code-cherryLamma-2/useful-coder-ggml-q4_0.bin"
 MODEL = f"./models/{USEFUL_CODER}"
 ```
 ## 🏃‍♀️ Run it
-To run simply execute:
-```bash python app.py ```
+- Simply execute: ```bash python app.py ```
+
 The Flask server will start and listen on port 8000. The server exposes two endpoints ```/generate``` and ```/run.```
 ## 🌐 Endpoints
 - `/generate`: receives a POST request with a user's question in the body. The question is processed by the LLM, and a 
 Python code snippet is generated and returned.
+
 - `/run`: receives a POST request with Python code in the body. The code is executed, and the output of the execution 
 is returned.
 ## 🤝 Contributing
