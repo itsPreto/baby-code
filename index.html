@@ -1,117 +1,310 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <style>
-        @keyframes bounce {
-            0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
-            40% {transform: translateY(-20px);}
-            60% {transform: translateY(-10px);}
-        }
+   <head>
+      <link rel="stylesheet" type="text/css" href="styles.css">
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+   </head>
+   <body>
+      <div class="version">v0.0.1</div>
+      <div id="main_output_container" style="display: flex; justify-content: center; align-items: center; flex-direction: column;">
+         <div style="display: flex; justify-content: center; align-items: center;">
+            <h2>BABY</h2>
+            <div style="position: relative; display: flex; flex-direction: column; align-items: center; margin: 0px -5px -20px;">
+               <h2 id="interpreter">INTERPRETER</h2>
+               <img id="logo1" class="logo" src="assets/logos/baby-llama-logo.png" alt="logo" style="height: 120px; width: auto; position: absolute;" title="DALL-E: a cartoon-ish baby llama that wants to interpret python code dressed up as the grim reaper">
+               <img id="logo2" class="logo" src="assets/logos/baby-llama-logo2.png" alt="logo" style="height: 120px; width: auto; position: absolute;" title="DALL-E: (v2) a cartoon-ish baby llama that wants to interpret python code dressed up as the grim reaper">
+               <img id="logo3" class="logo" src="assets/logos/baby-llama-logo3.png" alt="logo" style="height: 120px; width: auto; position: absolute;" title="DALL-E: (V3) a cartoon-ish baby llama that wants to interpret python code dressed up as the grim reaper">
+            </div>
+            <h2>CODE</h2>
+         </div>
+      </div>
+      <div class="container">
+         <div class="panel panel-default">
+            <div class="panel-heading">
+               <i class="fa fa-edit"
+                  style="  font-size:26px; display: none;"
+                  onmouseover="this.style.transform = 'translateY(-5px)'"
+                  onmouseout="this.style.transform = 'translateY(0)'"
+                  onclick="makeEditable()"></i>
+            </div>
+            <div class="panel-body">
+               <textarea id="output" placeholder='[INST] <<SYS>>
+                  You are a helpful assistant, that communicates ONLY and strictly ONLY with python code.
+                  The code must include any necessary function definitions and must also include commands
+                  to run these functions and print the results.
+                  The goal is to have a complete, runnable Python script in each response.
+                  Your responses MUST absolutely follow the format below:
+                  python
+                  ```
+                  {CODE}
+                  ```
+                  NOTE: If you are not able to provide an answer despite all your efforts you may simply
+                  reply with that reason.
+                  OBS: DO NOT INCLUDE ANY EXPLANATION. ONLY CODE.
+                  The [INST] block will always be a json in the following format:
+                  {
+                  "prompt": {the user request}
+                  }
+                  <</SYS>> [/INST]'readonly></textarea>
+               <div id="footer-buttons">
+                  <button id="btn1" style="height: 8.9mm; width: 8.9mm; background-image: url('./assets/btns/iterate_btn.png'); background-repeat: no-repeat; background-size: cover; background-position: center;">Button 1</button>
+                  <button id="btn2" style="height: 8.5mm; width: 8.5mm; background-image: url('./assets/btns/randomize_btn.png'); background-repeat: no-repeat; background-size: cover; background-position: center;">Button 2</button>
+                  <button id="btn3" style="height: 7.5mm; width: 7.5mm; background-image: url('./assets/btns/upload_btn.png'); background-repeat: no-repeat; background-size: cover; background-position: center;">Button 3</button>
+                  <button id="btn4" style="height: 6mm; width: 6mm; background-image: url('./assets/btns/history_btn.png'); background-repeat: no-repeat; background-size: cover; background-position: center;">Button 4</button>
+                  <button id="btn5" style="height: 6mm; width: 6mm; background-image: url('./assets/btns/share_btn.png'); background-repeat: no-repeat; background-size: cover; background-position: center;">Button 5</button>
+               </div>
+            </div>
+         </div>
+      </div>
+      <button id="sendButton" class="hoverable" onclick="sendCode()" title="borrowed from stackoverflow:) @ https://stackoverflow.com/a/58694475"></button>
+      <textarea id="code" placeholder="enter prompt & hit &#x1F34C;" style="text-align: center;"></textarea>
+      <div class="slider">
+         <div class="slide-track">
+            <div class="slide">
+               <a href="https://github.com/langchain-ai/langchain" target="_blank" >
+               <img style="padding-bottom: 30px;" src="assets/footer/langchain.png" height="100" width="100" alt="" />
+               </a>
+            </div>
+            <div class="slide">
+               <a href="https://html.com/" target="_blank" >
+               <img style="padding-bottom: 67px;"  src="assets/footer/html_css_js.png" height="30" width="100" alt="" />
+               </a>
+            </div>
+            <div class="slide">
+               <a href="https://ai.meta.com/llama/" target="_blank" >
+               <img style="padding-bottom: 55px;"  src="assets/footer/meta_llama_2.png" height="50" width="80" alt="" />
+               </a>
+            </div>
+            <div class="slide">
+               <a href="https://www.python.org/" target="_blank" >
+               <img style="padding-bottom: 56px;"  src="assets/footer/python.png" height="50" width="80" alt="" />
+               </a>
+            </div>
+            <div class="slide">
+               <a href="https://github.com/ggerganov/llama.cpp" target="_blank" >
+               <img style="padding-bottom: 67px;"  src="assets/footer/llama_cpp.png" height="35" width="50" alt="" />
+               </a>
+            </div>
+            <div class="slide">
+               <a href="https://github.com/langchain-ai/langchain" target="_blank" >
+               <img style="padding-bottom: 30px;"  src="assets/footer/langchain.png" height="100" width="100" alt="" />
+               </a>
+            </div>
+            <div class="slide">
+               <a href="https://html.com/" target="_blank" >
+               <img style="padding-bottom: 67px;"  src="assets/footer/html_css_js.png" height="30" width="100" alt="" />
+               </a>
+            </div>
+            <div class="slide">
+               <a href="https://ai.meta.com/llama/" target="_blank" >
+               <img style="padding-bottom: 55px;"  src="assets/footer/meta_llama_2.png" height="50" width="80" alt="" />
+               </a>
+            </div>
+            <div class="slide">
+               <a href="https://www.python.org/" target="_blank" >
+               <img style="padding-bottom: 56px;"  src="assets/footer/python.png" height="50" width="80" alt="" />
+               </a>
+            </div>
+            <div class="slide">
+               <a href="https://github.com/ggerganov/llama.cpp" target="_blank" >
+               <img style="padding-bottom: 62px;"  src="assets/footer/llama_cpp.png" height="35" width="50" alt="" />
+               </a>
+            </div>
+             <div class="slide">
+               <p style="color: white; padding: 5px;">Made possible by open source;</p>
+             </div>
+         </div>
+      </div>
+      <script>
+         const sendButton = document.getElementById("sendButton");
+         const output = document.getElementById("output");
 
-        body {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            margin: 0;
-            background: linear-gradient(to right, #ff9966, #ff5e62);
-            font-family: Arial, sans-serif;
-        }
+         const codeTextarea = document.getElementById('code');
 
-        h2 {
-            color: #fff;
-        }
+         codeTextarea.oninput = function() {
+             this.style.textAlign = this.value ? 'left' : 'center';
+         };
+         // Get placeholder text
+         const text = output.placeholder;
 
-        #code, #output {
-            width: 50%;
-            padding: 1em;
-            font-family: monospace;
-            margin-bottom: 1em;
-            border-radius: 5px;
-            border: none;
-        }
+         // Match delimiters
+         const formatted = text.replace(/\[INST\] <<SYS>> <\/SYS>> \[\/INST\]/g,
+           '<span style="color: blue">$&</span>'
+         );
 
-        #code {
-            height: 150px;
-            background-color: rgba(255, 255, 255, 0.9);
-        }
+         // Set formatted text as new placeholder
+         output.placeholder = formatted;
 
-        #output {
-            height: 100px;
-            margin-top: 20px;
-            background-color: rgba(255, 255, 255, 0.7);
-        }
+         function makeEditable() {
+           // Toggle editability
+           output.readOnly = !output.readOnly;
 
-        button {
-            padding: 10px 20px;
-            border: none;
-            color: #fff;
-            background-color: #007BFF;
-            cursor: pointer;
-            border-radius: 5px;
-            transition: background-color 0.3s ease;
-        }
+           // Change caret color based on editability
+           if (output.readOnly) {
+             output.style.caretColor = 'transparent';
+           } else {
+             output.style.caretColor = 'auto';
 
-        button:hover {
-            background-color: #0056b3;
-            animation: bounce 1s;
-        }
-    </style>
-</head>
-<body>
+             // Focus textarea when made editable
+             output.focus();
+             output.value = output.placeholder;
+           }
+         }
 
-<h2>Python Code Executor</h2>
+         let currentLogo = 1;
 
-<textarea id="code">
-print("Hello, World!")
-</textarea>
+         function animateLogo() {
+             // Fade out and lower z-index of current logo
+             const currentLogoElement = document.getElementById(`logo${currentLogo}`);
+             currentLogoElement.style.opacity = '0';
+             currentLogoElement.style.zIndex = '0';
 
-<button onclick="sendCode()">Run</button>
+             // Increment currentLogo, looping back to 1 if necessary
+             currentLogo = currentLogo % 3 + 1;
 
-<textarea id="output" readonly></textarea>
+             // Fade in and raise z-index of next logo
+             const nextLogoElement = document.getElementById(`logo${currentLogo}`);
+             nextLogoElement.style.opacity = '1';
+             nextLogoElement.style.zIndex = '1';
+         }
 
-<script>
-    async function sendCode() {
-      try {
-        const question = document.getElementById('code').value;
-        const response = await fetch('http://localhost:8000/generate', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({question}),
-        });
 
-        if (!response.ok) {
-          const message = `An error has occured: ${response.status}`;
-          throw new Error(message);
-        }
+         // Call animateLogo every second
+         setInterval(animateLogo, 8000);
 
-        const code = await response.text();
+         const btn1 = document.getElementById("btn1");
+         const btn2 = document.getElementById("btn2");
+         const btn3 = document.getElementById("btn3");
+         const footerButtons = document.getElementById('footer-buttons');
 
-        const runResponse = await fetch('http://localhost:8000/run', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({code}),
-        });
+         function toggleVerticalScrollOnBody() {
+         console.log("output width:" + output.style.width);
+         console.log("footerButtons width:" + footerButtons.style.width);
+         footerButtons.style.width = getComputedStyle(output).width;
+         // Get the height of the output window
+         const outputHeight = document.getElementById('output').offsetHeight;
 
-        if (!runResponse.ok) {
-          const message = `An error has occured: ${runResponse.status}`;
-          throw new Error(message);
-        }
+         // If the output window height is greater than 520px, enable scrolling on the body
+         if (outputHeight > 523) {
+             document.body.style.overflowY = 'scroll';
+         }
+         // If the output window height is less than or equal to 520px, disable scrolling on the body
+         else {
+             document.body.style.overflowY = 'hidden';
+         }
+         }
+         toggleVerticalScrollOnBody()
 
-        const output = await runResponse.text();
-        document.getElementById('output').value = output;
-      } catch (error) {
-        console.log(error);
-        document.getElementById('output').value = "Error: " + error.message;
-      }
-    }
+         new ResizeObserver(toggleVerticalScrollOnBody).observe(output)
 
-</script>
+         btn1.addEventListener('click', function() {
+             console.log("Button 1 clicked");
+             // Add your code here
+         });
 
-</body>
+         btn2.addEventListener('click', function() {
+             console.log("Button 2 clicked");
+             // Add your code here
+         });
+
+         btn3.addEventListener('click', function() {
+             console.log("Button 3 clicked");
+             // Add your code here
+         });
+         output.addEventListener('keydown', e => {
+
+           // Check if Shift+Enter was pressed
+           if(e.shiftKey && e.key === 'Enter') {
+             // Prevent browser from inserting newline
+             e.preventDefault();
+
+             // If already in edit mode, update placeholder and clear text
+             if(!output.readOnly) {
+               // Get current text
+               const text = e.target.value;
+
+               // Update placeholder with current text
+               e.target.placeholder = text;
+
+               // Reset value to empty string
+               e.target.value = "";
+             }
+
+             // Toggle editability
+             output.readOnly = !output.readOnly;
+
+             // Change caret color based on editability
+             if (output.readOnly) {
+               output.style.caretColor = 'transparent';
+             } else {
+               output.style.caretColor = 'auto';
+
+               // Focus textarea when made editable
+               output.focus();
+               output.value = output.placeholder;
+             }
+           }
+         });
+
+
+         async function sendCode() {
+         document.querySelector(".hoverable").style.backgroundImage = "url('https://i.stack.imgur.com/WwxRR.gif')";
+           document.getElementById('output').value = "";
+           try {
+
+             // Get raw prompt text
+             const question = document.getElementById('code').value;
+
+             // Wrap it in the INST format
+             const formattedPrompt = `
+             [INST]
+             {
+               "prompt": "${question}"
+             }
+             [/INST]`;
+
+             // Send formattedPrompt to API
+             const response = await fetch('http://localhost:8000/generate', {
+               method: 'POST',
+               headers: {
+                 'Content-Type': 'application/json',
+               },
+               body: JSON.stringify({
+                 question: formattedPrompt
+               })
+             });
+
+             if (!response.ok) {
+               const message = `An error has occurred: ${response.status}`;
+               throw new Error(message);
+             }
+
+             const code = await response.text();
+
+             const runResponse = await fetch('http://localhost:8000/run', {
+               method: 'POST',
+               headers: {
+                 'Content-Type': 'application/json',
+               },
+               body: JSON.stringify({code}),
+             });
+
+             if (!runResponse.ok) {
+               const message = `An error has occurred: ${runResponse.status}`;
+               throw new Error(message);
+             }
+
+             const output = await runResponse.text();
+             document.querySelector(".hoverable").style.backgroundImage = "url('https://i.stack.imgur.com/mJHTA.png')";
+             document.getElementById('output').value = output;
+           } catch (error) {
+             console.log(error);
+             document.getElementById('output').value = "Error: " + error.message;
+             document.querySelector(".hoverable").style.backgroundImage = "url('https://i.stack.imgur.com/mJHTA.png')";
+           }
+         }
+
+      </script>
+   </body>
 </html>

@@ -3,7 +3,9 @@ import os
 from langchain import SerpAPIWrapper
 from langchain.agents import Tool
 
-os.environ["SERPAPI_API_KEY"] = "34a54bbdd2adbba455c07986d1ca7703700c9cf944a59905f570f7db58b89d97"
+
+
+os.environ["SERPAPI_API_KEY"] = "API_KEY"
 
 # Define which tools the agent can use to answer user queries
 search = SerpAPIWrapper()
