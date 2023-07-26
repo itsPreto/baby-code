@@ -10,8 +10,18 @@ It leverages open source LLMs to interpret user's requests into Python code.
 The service is exposed through a Flask server which receives user's requests, processes them, and returns Python code.
 
 ## Setup
+Clone the repo:
 
-Install the required libraries to get started (_requirements.txt coming soon..._):
+```bash
+git clone https://github.com/itsPreto/baby-interpreter
+```
+Navigate to the project:
+
+```bash
+cd baby-interpreter
+```
+
+Install the following libraries (_requirements.txt coming soon..._):
 
 ```bash
 pip install flask flask_cors subprocess langchain
