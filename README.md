@@ -6,10 +6,11 @@ An open-source, locally-run, python code interpreter [(like openAI's GPT-4 Plugi
 - [x] extremly SIMPLE,
 - [x] 100% LOCAL &
 - [x] CROSS-PLATFORM.
+
 It leverages open source LLMs to interpret user's requests into Python code. 
 The service is exposed through a Flask server which receives user's requests, processes them, and returns Python code.
 
-## 🏗️ Architecture ((in a nutshell)
+## 🏗️ Architecture (in a nutshell)
 
 - 🖥️ **_Backend_**: Python Flask (CORS for serving both the API and the HTML).
 - 🌐 **_Frontend_**: HTML/JS/CSS (The UI was designed 100% to personal liking but open for changes).
