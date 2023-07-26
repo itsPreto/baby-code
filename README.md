@@ -61,6 +61,8 @@ is returned.
   Contributions to this project are welcome. Please create a fork of the repository, make your changes, and submit a pull 
 request.
   I'll be creating a few issues for feature tracking soon!!
-  ALSO~~~ If anyone would like to start a Discord channel and help me manage it that would be awesome _(I'm not on it that much)_.
+
+  
+ALSO~~~ If anyone would like to start a Discord channel and help me manage it that would be awesome _(I'm not on it that much)_.
 ## License
 This project is licensed under the MIT License.
