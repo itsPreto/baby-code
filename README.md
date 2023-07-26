@@ -1,5 +1,5 @@
 # 🦙 Baby Code Interpreter
-An open-source, locally-run, python code interpreter [(like openAI's GPT-4 Plugin: Code-Interpreter).](https://pub.towardsai.net/gpt-4-code-interpreter-your-magic-wand-for-instant-python-data-visuals-f40fcfb5e39b)
+An open-source, locally-run, python code interpreter [(like openAI's GPT-4 Plugin: Code-Interpreter)](https://pub.towardsai.net/gpt-4-code-interpreter-your-magic-wand-for-instant-python-data-visuals-f40fcfb5e39b) (though not as capable, _for now_ _🚀_)
 
 ## Baby Code is:
 - [x] primarily and mostly for fun, as it is extremely early in development.
