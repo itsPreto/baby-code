@@ -31,7 +31,7 @@ git clone https://github.com/itsPreto/baby-code
 -  Navigate to the project:
   
 ```bash 
-cd baby-interpreter
+cd baby-code
 ```
 
 - Install the required libraries:
