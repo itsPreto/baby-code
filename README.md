@@ -25,7 +25,7 @@ The service is exposed through a Flask server which receives user's requests, pr
 - Clone the repo:
   
 ```bash 
-git clone https://github.com/itsPreto/baby-interpreter
+git clone https://github.com/itsPreto/baby-code
 ```
 
 -  Navigate to the project:
