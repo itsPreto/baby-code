@@ -2,14 +2,22 @@ import argparse
 from flask import Flask, jsonify, request, Response
 import urllib.parse
 import requests
+import psutil
 import time
+import re
 import json
-
+import subprocess
+import time
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app) 
 
 parser = argparse.ArgumentParser(description="An example of using server.cpp with a similar API to OAI. It must be used together with server.cpp.")
-parser.add_argument("--chat-prompt", type=str, help="the top prompt in chat completions(default: 'A chat between a curious user and an artificial intelligence assistant. The assistant follows the given rules no matter what.\\n')", default='A chat between a curious user and an artificial intelligence assistant. The assistant follows the given rules no matter what.\\n')
+parser.add_argument("--chat-prompt", type=str, 
+                    help="the top prompt in chat completions(default: 'A chat between a curious user and an artificial intelligence assistant. The assistant follows the given rules no matter what.\\n')", 
+                    default='[INST] <<SYS>>\nYou are a helpful assistant, that communicates ONLY and strictly ONLY with python code.\nThe code must include any necessary function definitions and must also include commands\nto run these functions and print the results.\nThe goal is to have a complete, runnable Python script in each response.\nYour responses MUST absolutely follow the format below:\npython\n```\n{CODE}\n```\nNOTE: If you are not able to provide an answer despite all your efforts you may simply\nreply with that reason.\nOBS: DO NOT INCLUDE ANY EXPLANATION. ONLY CODE.\nThe [INST] block will always be a json in the following format:\n{\n"prompt": {the user request}\n}\n<</SYS>> [/INST]')
+# ...parser.add_argument("--chat-prompt", type=str, help="the top prompt in chat completions(default: 'A chat between a curious user and an artificial intelligence assistant. The assistant follows the given rules no matter what.\\n')", default='A chat between a curious user and an artificial intelligence assistant. The assistant follows the given rules no matter what.\\n')
 parser.add_argument("--user-name", type=str, help="USER name in chat completions(default: '\\nUSER: ')", default="\\nUSER: ")
 parser.add_argument("--ai-name", type=str, help="ASSISTANT name in chat completions(default: '\\nASSISTANT: ')", default="\\nASSISTANT: ")
 parser.add_argument("--system-name", type=str, help="SYSTEM name in chat completions(default: '\\nASSISTANT's RULE: ')", default="\\nASSISTANT's RULE: ")
@@ -166,7 +174,9 @@ def chat_completions():
     if (not stream):
         data = requests.request("POST", urllib.parse.urljoin(args.llama_api, "/completion"), data=json.dumps(postData))
         print(data.json())
+        python_code = extract_python_code(data.json()["content"])
         resData = make_resData(data.json(), chat=True, promptToken=promptToken)
+        resData['choices'][0]['text'] = python_code
         return jsonify(resData)
     else:
         def generate():
@@ -182,38 +192,46 @@ def chat_completions():
         return Response(generate(), mimetype='text/event-stream')
 
 
-@app.route('/completions', methods=['POST'])
-@app.route('/v1/completions', methods=['POST'])
-def completion():
+@app.route('/usage')
+def usage():
+    cpu_usage = psutil.cpu_percent(interval=1)
+    return jsonify({'cpu_usage': cpu_usage})  
+
+@app.route('/run_python_code', methods=['POST'])
+def run_python_code():
+    print(f"run_python_code called...")
+
     if (args.api_key != "" and request.headers["Authorization"].split()[1] != args.api_key):
         return Response(status=403)
     body = request.get_json()
-    stream = False
-    tokenize = False
-    if(is_present(body, "stream")): stream = body["stream"]
-    if(is_present(body, "tokenize")): tokenize = body["tokenize"]
-    postData = make_postData(body, chat=False, stream=stream)
+    print(f"run_python_code called: {body}")
 
-    promptToken = []
-    if (tokenize):
-        tokenData = requests.request("POST", urllib.parse.urljoin(args.llama_api, "/tokenize"), data=json.dumps({"content": postData["prompt"]})).json()
-        promptToken = tokenData["tokens"]
+    code = body['code']
 
-    if (not stream):
-        data = requests.request("POST", urllib.parse.urljoin(args.llama_api, "/completion"), data=json.dumps(postData))
-        print(data.json())
-        resData = make_resData(data.json(), chat=False, promptToken=promptToken)
-        return jsonify(resData)
-    else:
-        def generate():
-            data = requests.request("POST", urllib.parse.urljoin(args.llama_api, "/completion"), data=json.dumps(postData), stream=True)
-            time_now = int(time.time())
-            for line in data.iter_lines():
-                if line:
-                    decoded_line = line.decode('utf-8')
-                    resData = make_resData_stream(json.loads(decoded_line[6:]), chat=False, time_now=time_now)
-                    yield 'data: {}\n'.format(json.dumps(resData))
-        return Response(generate(), mimetype='text/event-stream')
+    # Execute the code and capture its output
+    try:
+        output = subprocess.check_output(["python3", "-c", code])
+        return output.decode('utf-8')
+    except subprocess.CalledProcessError as e:
+        return f"Error executing Python code: {e.output.decode('utf-8')}"
+
+def extract_python_code(text):
+    # Extract Python code enclosed in triple backticks
+    match = re.search(r"```python\n(.*?)```", text, re.DOTALL)
+
+    if match:
+        code = match.group(1)
+        print("Extracted code:", repr(code))  # use repr to see special characters
+        return code
+
+    # No Python code found
+    return None
+
 
 if __name__ == '__main__':
+    # Run the external command
+    subprocess.Popen(["./../../server", "-m", "../../models/code_cherry_Llama_q4_0.bin", "-c", "2048", "-ngl", "30"])
+
+    # Pause for 5 seconds
+    time.sleep(5)
     app.run(args.host, port=args.port)
