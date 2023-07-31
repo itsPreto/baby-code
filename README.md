@@ -7,7 +7,7 @@ An open-source, locally-run, python code interpreter [(like openAI's GPT-4 Plugi
 - [x] 100% LOCAL &
 - [x] CROSS-PLATFORM.
 
-![Screenshot 2023-07-26 at 1 41 33 PM](https://github.com/itsPreto/baby-code/assets/45348368/d895b87b-7d26-44cb-9c1f-05b12f2188ed)
+<img width="1004" alt="Screenshot 2023-07-30 at 10 46 07 PM" src="https://github.com/itsPreto/baby-code/assets/45348368/0237f891-be3d-473e-a488-39c5b529da7f">
 
 It leverages open source LLMs to interpret user's requests into Python code. 
 The service is exposed through a Flask server which receives user's requests, processes them, and returns Python code.
@@ -90,3 +90,4 @@ request.
 > _(I'm not on it that much)_.
 ## License
 This project is licensed under the MIT License.
+>>>>>>> origin/develop

@@ -2,3 +2,5 @@ Flask==2.3.2
 Flask-Cors==4.0.0
 langchain==0.0.244
 llama-cpp-python==0.1.77
+numpy==1.24
+sentencepiece==0.1.98
