@@ -34,19 +34,24 @@ What's New? [(_see old archived repo_)](https://github.com/itsPreto/baby-code/bl
 - Clone the repo:
 
 ```bash
-git clone https://github.com/itsPreto/baby-llama.pycpp
+git clone https://github.com/itsPreto/baby-code
 ```
 
 -  Navigate to the project:
 
 ```bash
-cd baby-llama.pycpp
+cd baby-code/llama.cpp
 ```
 
 - Install the required libraries:
 
 ```bash
 pip install -r requirements.txt
+```
+
+- Then repeat the same for the root project:
+```bash
+cd baby-code && pip install -r requirements.txt
 ```
 
 ## 💾 Model Download
@@ -70,8 +75,9 @@ Load up your chosen model `ggml` for local inference using CPU or GPU by simply 
 ```python
 if __name__ == '__main__':
     # Run the external command
-    subprocess.Popen(["./server", "-m", "models/code_cherry_Llama_q4_0.bin", "-c", "2048", "-ngl", "30"])
-
+    server_process = subprocess.Popen(
+        ["./llama.cpp/server", "-m", "./llama.cpp/models/wizardcoder-python-13b-v1.0.Q5_K_M.gguf", "-c", "1024",
+         "-ngl", "1", "--path", "."])
     # Pause for 5 seconds
     time.sleep(5)
     app.run(args.host, port=args.port)
@@ -91,7 +97,7 @@ parser.add_argument("--port", type=int, help="Set the port to listen.(default: 8
 ## 🏃‍♀️ Run it
 - From the project `root` simply run:
 ```bash
-python3 baby-code/baby_code.py
+python3 baby_code.py
 ```
 
 The `server.cpp` will be served to `http://127.0.0.1:8080/` by default, while the the Flask (`baby_code.py`) currently listens on port 8081.
