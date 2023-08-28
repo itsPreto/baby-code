@@ -1,0 +1,50 @@
+Create synthetic data and visualize the relationship between two sets of data on a 2D plane.
+Generate synthetic data to show how different categories compare in terms of their counts.
+Use synthetic data to highlight the trend between two variables and indicate the strength of their correlation.
+Produce synthetic data to compare the distribution of multiple categories in a single visualization.
+With synthetic data, display a scatter plot with markers of varying sizes to indicate importance or quantity.
+Construct synthetic data to visualize the correlation matrix of a dataset to understand inter-variable relationships.
+Create synthetic data to show a pairwise relationship of variables in a multi-dimensional dataset.
+Using synthetic data, contrast positive and negative values in a diverging manner.
+Develop synthetic data to stack data series on top of each other to indicate volume or counts over time.
+With synthetic data, display a categorical breakdown of a metric using vertical bars.
+Generate synthetic time series data and highlight significant events using annotations.
+Create synthetic time series data and decompose it to show its trend, seasonal, and random components.
+Visualize multiple synthetic time series data on the same plot for comparison.
+Use dual axes to compare two synthetic metrics with different scales over time.
+Show the variation in synthetic data using error bands or confidence intervals.
+Visualize daily activities or events over the course of a year using a calendar heatmap with synthetic data.
+Group synthetic data by seasons or cycles to highlight periodic trends.
+Use a hierarchical tree to represent the structure of nested synthetic data.
+Cluster synthetic data points based on similarity and display them in distinct colors or groups.
+Utilize parallel lines to visualize multi-dimensional synthetic data.
+Show the distribution of a single synthetic variable using a histogram.
+Highlight the central tendency and spread of synthetic data using a box plot.
+Combine categorical plots to show individual synthetic data points and their overall distribution.
+Visualize synthetic data distributions for different categories side by side.
+Break down synthetic data into its constituent categories using a pie or donut chart.
+Use a treemap to show hierarchical synthetic data with nested rectangles.
+Show synthetic data progression over a continuous interval using an area chart.
+Visualize synthetic categorical data distributions using violin plots.
+Represent a synthetic dataset's density distribution using a density or KDE plot.
+Show the difference between two time points for various synthetic categories using a slope chart.
+Visualize the start and end points of synthetic categories using a dumbbell plot.
+Highlight the density of events over a continuous synthetic variable using strip or swarm plots.
+Display synthetic multi-dimensional dataset using Andrews curves.
+Capture the distribution and outliers of synthetic data using a combination of box and dot plots.
+Visualize the proportion of synthetic categories using a waffle chart.
+Show the distribution of synthetic data for various groups using grouped or stacked bar charts.
+Represent synthetic data frequency using a lollipop chart.
+Highlight the peaks and troughs of synthetic data using a dot plot.
+Visualize correlations in synthetic time-lagged data using an ACF or PACF plot.
+Display hierarchical clustering of synthetic data using a dendrogram.
+Show the change in a synthetic metric over categories using a bar chart.
+Visualize the flow or sequence of synthetic data using a Sankey diagram.
+Highlight the distribution of a synthetic metric across categories using a radial or spider chart.
+Capture the composition of synthetic data over time using stacked area or stream graphs.
+Visualize the concentration of synthetic data points in a scatter plot using hexbin plots.
+Highlight similarities or differences in synthetic datasets using mirrored histograms or back-to-back bar charts.
+Represent a comparison of two related synthetic metrics for various categories using a bullet chart.
+Visualize cyclic synthetic data using radial or circular plots.
+Represent a synthetic dataset's distribution across quantiles using a Q-Q plot.
+Visualize the impact or effect of one variable on another using a scatter plot matrix with synthetic data.

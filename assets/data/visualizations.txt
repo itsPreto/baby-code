@@ -1,0 +1,390 @@
+# Scatter Plot
+import matplotlib.pyplot as plt
+x = [1,2,3,4,5]
+y = [2,4,6,8,10] 
+plt.scatter(x,y)
+plt.xlabel('x')
+plt.ylabel('y')
+plt.show()
+
+# Bubble Plot
+import matplotlib.pyplot as plt 
+x = [1,2,3,4,5]
+y = [2,4,6,8,10]
+sizes = [10,20,30,40,50]
+colors = ['red','green','blue','orange','yellow']
+plt.scatter(x, y, s=sizes, c=colors)
+plt.xlabel('x')
+plt.ylabel('y')
+plt.show()
+
+# Scatter Plot with Regression
+import matplotlib.pyplot as plt
+import numpy as np
+x = np.random.rand(30)
+y = x*3 + np.random.rand(30)
+plt.scatter(x,y)
+plt.plot(x, x*3, c='r')
+plt.xlabel('x')  
+plt.ylabel('y')
+plt.show()
+
+# Strip Plot 
+import seaborn as sns
+x = ['A','B','C']
+data = [1,2,3,4,5,6] 
+sns.stripplot(x=x, y=data)
+plt.xlabel('groups')
+plt.ylabel('data') 
+plt.show()
+
+# Counts Plot
+import matplotlib.pyplot as plt
+import pandas as pd
+df = pd.DataFrame({'x': [1,1,2,2,3], 'y': [1,2,2,3,3]}) 
+counts = df.groupby(['x','y']).size().reset_index(name='counts')
+plt.scatter(counts.x, counts.y, s=counts.counts*2)
+plt.show()
+
+# Marginal Histogram
+import seaborn as sns
+x = [1,2,3,4,5]
+y = [5,3,6,4,2]
+sns.jointplot(x, y, kind="hist")
+plt.show()
+
+# Marginal Boxplot
+import seaborn as sns  
+x = [1,2,3,4,5] 
+y = [5,3,6,4,2]
+sns.jointplot(x, y, kind="box")
+plt.show()
+
+# Correlogram 
+import seaborn as sns
+import numpy as np
+data = np.random.rand(5,5)
+sns.heatmap(data, annot=True) 
+plt.show()
+
+# Pairwise Plot
+import seaborn as sns
+iris = sns.load_dataset('iris')
+sns.pairplot(iris)
+plt.show() 
+
+# Diverging Bars
+import matplotlib.pyplot as plt
+x = [3,1,2]  
+y = range(len(x))
+plt.barh(y, x)
+plt.ylim(-1, len(x)) 
+plt.show()
+
+# Diverging Texts
+import matplotlib.pyplot as plt
+x = [3,1,2]
+y = range(len(x))
+for i, v in enumerate(x):
+    plt.text(v + .02, i, str(v), color='blue')
+plt.barh(y, x)
+plt.ylim(-1, len(x))  
+plt.show()
+
+# Diverging Dot Plot
+import matplotlib.pyplot as plt
+import numpy as np
+x = np.random.normal(0, 1, 100)
+plt.scatter(x, np.zeros_like(x), c=[( 'r' if xx < 0 else 'g') for xx in x], s=100)
+plt.xlim(-4,4)
+plt.show()
+
+# Diverging Lollipop Chart
+import matplotlib.pyplot as plt
+x = [-1.2, 3.5, 2.3, -3.5]
+y = range(len(x)) 
+plt.hlines(y, 0, x, linewidth=2)
+plt.scatter(x, y, s=100, c='red')
+plt.ylim(-1, len(x))
+plt.show()
+
+# Area Chart
+import matplotlib.pyplot as plt
+x = [1,2,3,4,5]
+y = [1,2,3,2,1]
+plt.plot(x, y)
+plt.fill_between(x, y)
+plt.show()
+
+# Ordered Bar Chart
+import matplotlib.pyplot as plt  
+x = [3,1,2]
+y = range(len(x))
+plt.barh(y, x)
+for i, v in enumerate(x):
+    plt.text(v + .02, i, str(v), color='blue') 
+plt.show()
+
+# Lollipop Chart
+import matplotlib.pyplot as plt
+x = [1,3,2]  
+y = range(len(x))
+plt.stem(x, y) 
+plt.show()
+
+# Dot Plot
+import matplotlib.pyplot as plt
+x = [2,5,4,8]
+plt.plot(x, 'o')  
+plt.margins(0.2)
+plt.yticks(range(len(x)), x)
+plt.show()
+
+# Slope Chart
+import matplotlib.pyplot as plt
+before = [10,20,30] 
+after = [15,18,27]
+plt.plot(before, range(len(before)))
+plt.plot(after, range(len(after)))
+plt.show()
+
+# Dumbbell Plot
+import matplotlib.pyplot as plt
+start = [1,2,3]
+end = [3,2,4]
+y = range(len(start))
+plt.plot(start, y, 'o')
+plt.plot(end, y, 'o')
+plt.plot(start, y, '-o')
+plt.plot(end, y, '-o')
+plt.show()
+
+# Histogram
+import matplotlib.pyplot as plt
+data = [1,1,1,2,2,3,4,4,4,4,5,6]  
+plt.hist(data)
+plt.show()
+
+# Histogram for Categorical
+import matplotlib.pyplot as plt
+data = [1,1,1,2,2,3,4,4,4,4,5,6]
+groups = ['A','B','A','B','A','B','A','B','A','B','A','B'] 
+plt.hist(data, ec='k', color=['red','blue'])
+plt.show()
+
+# Density Plot
+import matplotlib.pyplot as plt
+import numpy as np
+data = np.random.randn(1000) 
+plt.density(data)
+plt.show() 
+
+# Density Plot Grid
+import seaborn as sns
+tips = sns.load_dataset('tips')
+g = sns.FacetGrid(tips, col="sex", margin_titles=True) 
+g.map(sns.kdeplot, "total_bill")
+plt.show()
+
+# Joyplot 
+import joypy
+import pandas as pd
+data = pd.DataFrame(data=np.random.randn(100,5), columns=['a','b','c','d','e'])
+joypy.joyplot(data)
+plt.show()
+
+# Distributed Dot Plot
+import matplotlib.pyplot as plt
+import numpy as np
+x1 = np.random.normal(0, 1, 100) 
+x2 = np.random.normal(2, 1, 100)
+plt.scatter(x1, np.zeros_like(x1), c='blue', s=10) 
+plt.scatter(x2, np.zeros_like(x2), c='red', s=10)
+plt.show()
+
+# Box Plot
+import matplotlib.pyplot as plt  
+data = [1,1,3,4,4,4,5,6]
+plt.boxplot(data)
+plt.show()
+
+# Dot + Box Plot
+import seaborn as sns
+tips = sns.load_dataset('tips')
+ax = sns.boxplot(x=tips['sex'], y=tips['total_bill'])
+sns.stripplot(x=tips['sex'], y=tips['total_bill'], jitter=True, ax=ax)
+plt.show()
+
+# Violin plot
+import seaborn as sns
+tips = sns.load_dataset('tips')
+ax = sns.violinplot(x="sex", y="total_bill", data=tips) 
+plt.show()
+
+# Population Pyramid
+import matplotlib.pyplot as plt
+age = [2,3,4,2,1]
+men = [2,3,4,2,1]  
+women = [1,2,1,2,3]
+plt.barh(age, men, color='blue')
+plt.barh(age, -women, color='red') 
+plt.show()
+
+# Categorical Plots
+import seaborn as sns
+titanic = sns.load_dataset('titanic')
+sns.catplot(x="sex", y="survived", hue="class", kind="bar", data=titanic) 
+plt.show()
+
+# Waffle Chart
+import matplotlib.pyplot as plt
+from pywaffle import Waffle
+data = {'A':12,'B':30,'C':8,'D':10}
+fig = plt.figure()
+Waffle(data, rows=5, values=data.values(), labels=data.keys(), legend={'loc': 'upper left', 'bbox_to_anchor': (1, 1)}).savefig(fig)
+fig.tight_layout()
+fig.show()
+
+# Pie Chart
+import matplotlib.pyplot as plt
+data = [10,20,30,40] 
+plt.pie(data)
+plt.show()
+
+# Treemap
+import squarify
+data = [10, 20, 30, 40]
+squarify.plot(sizes=data, label=data.keys(), color=data.keys())
+plt.axis('off')
+plt.show() 
+
+# Bar Chart
+import matplotlib.pyplot as plt
+x = [1,2,3,4]   
+y = [10,20,25,30]
+plt.bar(x,y)
+plt.show()
+
+# Time Series Plot
+import matplotlib.pyplot as plt
+import pandas as pd
+data = pd.Series(range(1,10))
+data.plot()
+plt.show()
+
+# Time Series with Annotations
+import matplotlib.pyplot as plt
+time = [1,2,3,4,5]
+data = [10,12,8,14,5]  
+plt.plot(time, data)
+plt.scatter(3, 8, s=100, c='red') 
+plt.annotate('Low', xy=(3,8), xytext=(3.5, 5), arrowprops=dict(facecolor='black')) 
+plt.show()
+
+# ACF PACF
+from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
+data = [1,2,3,4,5,6,7,8,9]
+plot_acf(data)
+plot_pacf(data)
+plt.show()
+
+# Cross Correlation
+from statsmodels.graphics.tsaplots import plot_acf
+x = [1,2,3,4,5,6]
+y = [10,20,30,40,50,60]  
+plot_acf(x,y)
+plt.show()
+
+# Time Series Decomposition
+from statsmodels.tsa.seasonal import seasonal_decompose
+data = [1,2,3,4,5,6,7,8,9,10,11,12]
+result = seasonal_decompose(data)  
+result.plot()
+plt.show()
+
+# Multiple Time Series
+import matplotlib.pyplot as plt
+import pandas as pd
+df = pd.DataFrame(data=np.random.randn(50,3),columns=['a','b','c']) 
+df.plot()
+plt.show()
+
+# Dual Axis Time Series
+import matplotlib.pyplot as plt
+import pandas as pd
+time = pd.date_range('2020-01-01', periods=10, freq='M')
+data1 = pd.Series(range(10))  
+data2 = pd.Series(range(50,60))
+fig, ax1 = plt.subplots()
+ax1.plot(time, data1)
+ax2 = ax1.twinx()  
+ax2.plot(time, data2, c='r')
+plt.show()
+
+# Time Series Error Bands
+import matplotlib.pyplot as plt 
+import pandas as pd
+df = pd.DataFrame(data=np.random.randn(30,4), columns=list('ABCD'))
+df.rolling(window=3).mean().plot(style='-o', yerr=df.rolling(window=3).std())
+plt.show()
+
+# Stacked Area Chart 
+import matplotlib.pyplot as plt
+time = [1,2,3,4]
+data1 = [1,2,3,4]
+data2 = [4,3,2,1]  
+plt.stackplot(time, data1, data2)
+plt.show()
+
+# UnStacked Area Chart
+import matplotlib.pyplot as plt  
+time = [1,2,3,4]
+data1 = [1,2,3,4] 
+data2 = [4,3,2,1]
+plt.plot(time, data1, label='Data 1')
+plt.plot(time, data2, label='Data 2')
+plt.stackplot(time, data1, data2, colors=['#AAAAAA','#CCCCCC'])
+plt.legend()
+plt.show()
+
+# Calendar Heatmap
+import calmap
+import pandas as pd
+df = pd.DataFrame(data=np.random.randn(365,4), columns=list('ABCD'))
+calmap.calendarplot(df['A'])
+plt.show()
+
+# Seasonal Plot
+import matplotlib.pyplot as plt
+import pandas as pd
+df = pd.DataFrame({'Year':[2000,2001],'Data':[10,30]}) 
+df = df.set_index(['Year'])
+df.unstack().plot(kind='line')
+plt.show() 
+
+# Dendrogram
+from scipy.cluster.hierarchy import dendrogram, linkage
+import matplotlib.pyplot as plt
+X = [[i] for i in range(10)]
+dendrogram(linkage(X, 'ward'))
+plt.show()
+
+# Cluster Plot 
+from sklearn.datasets import make_blobs
+import matplotlib.pyplot as plt
+X, y = make_blobs(n_samples=150, n_features=2, centers=3)
+plt.scatter(X[:,0], X[:,1], c=y, s=50, cmap='Accent')
+plt.show()
+
+# Andrews Curves
+from pandas.plotting import andrews_curves
+data = pd.read_csv('https://raw.githubusercontent.com/selva86/datasets/master/mtcars.csv')
+andrews_curves(data, 'cyl')
+plt.show()
+
+# Parallel Coordinates
+from pandas.plotting import parallel_coordinates
+data = pd.read_csv('https://raw.githubusercontent.com/selva86/datasets/master/mtcars.csv')
+plt.figure(figsize=(12,9), dpi= 80) 
+parallel_coordinates(data, 'cyl', colormap='Dark2')
+plt.show()

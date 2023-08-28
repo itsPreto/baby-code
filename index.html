@@ -1,0 +1,810 @@
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="styles.css">
+    <link rel="icon" type="image/png" href="assets/favicon/baby_llama_logo.png">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="color-scheme" content="light dark">
+    <title>Baby 🦙 Code 🐍 Interpreter</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.23.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.23.0/components/prism-python.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <script type="module">
+    import {
+      html, h, signal, effect, computed, render, useSignal, useEffect, useRef
+    } from '/index.js';
+
+    import { llama } from '/completion.js';
+
+    const ogPrompt = "You are a gifted python developer. Provide ALL your scripts in within single python markdown block. Ensure they are executable. Be efficient with compute. Maintain clear communication and a friendly demeanor. Use emojis occasionally. 😊👍";
+
+    const session = signal({
+      prompt: ogPrompt,
+      template: "{{prompt}}\n\n{{history}}\n{{char}}:",
+      historyTemplate: "{{name}}: {{message}}",
+      transcript: [],
+      type: "chat",
+      char: "llama",
+      user: "User",
+    })
+
+    const params = signal({
+      n_predict: 900,
+      temperature: 0.4,
+      repeat_last_n: 256, // 0 = disable penalty, -1 = context size
+      repeat_penalty: 1.18, // 1.0 = disabled
+      top_k: 40, // <= 0 to use vocab size
+      top_p: 0.5, // 1.0 = disabled
+      tfs_z: 1.0, // 1.0 = disabled
+      typical_p: 1.0, // 1.0 = disabled
+      presence_penalty: 0.0, // 0.0 = disabled
+      frequency_penalty: 0.0, // 0.0 = disabled
+      mirostat: 0, // 0/1/2
+      mirostat_tau: 5, // target entropy
+      mirostat_eta: 0.1, // learning rate
+    })
+
+    // Global array to store the prompts
+    let promptsArray = [];
+    const FILE_PATH_REGEX = /\/[^\s]+/g;
+
+
+    const llamaStats = signal(null)
+    const autoDebugging = signal(false);
+    const controller = signal(null)
+    const autoRun = signal(false);
+    const isSpinning = signal(false);
+    const successfulScriptsCount = signal(0);
+    const failedScriptsCount = signal(0);
+
+    const codeBlockExecutionStates = new Map();
+
+    const generating = computed(() => controller.value == null)
+    const chatStarted = computed(() => session.value.transcript.length > 0)
+
+    // Confetti animation on successfulScriptsCount update 
+    effect(() => {
+      setTimeout(() => {
+        confetti({
+          particleCount: 1000,
+          spread: 150,
+          origin: { y: 1.1 }
+        });
+      }, 390);
+    }, [successfulScriptsCount]);
+
+    const transcriptUpdate = (transcript) => {
+      session.value = {
+        ...session.value,
+        transcript
+      }
+      setTimeout(() => {
+        const mainContentContainer = document.getElementById("content");
+        if (mainContentContainer) {
+          mainContentContainer.scrollTop = mainContentContainer.scrollHeight;
+        }
+      }, 50); // 50ms delay
+    }
+
+    const addSysMessage = (msg) => {
+      // only neeed to display if autoDebugging since that take
+      if (!autoDebugging.value) {
+        transcriptUpdate([...session.value.transcript, ["System", msg]]);
+      }
+    }
+
+
+    const saveScript = async (code) => {
+      console.log("saveScript:" + code);
+    }
+
+    const extractCodeAndRun = async (code) => {
+      console.log("extractCodeAndRun:" + code);
+
+      // Ask the user for confirmation before running the code
+
+      if (!autoRun.value) {
+        if (!confirm('Do you want to run this code?')) {
+          return;
+        }
+      }
+
+      // Prepare fetch options
+      const options = {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ code: code })
+      };
+
+      // Send request
+      const response = await fetch('http://127.0.0.1:8081/run_python_code', options);
+
+      if (!response.ok) {
+        console.error(`API call failed with status ${response.status}`);
+
+        // If there was an error, get the error message
+        const errorMessage = await response.text();
+        console.error(`Error message: ${errorMessage}`);
+        return;
+      }
+
+      // Get response data
+      const data = await response.json();
+
+      // Get stderr
+      const errorMessage = data.stderr;
+
+      if (data.stdout.trim()) {
+        addSysMessage("Result:\n" + data.stdout);
+      } else if (data.stderr.trim()) {
+        addSysMessage("Error:\n" + extractErrorMessage(data.stderr));
+      }
+
+      renderCodeBlocks();
+
+      // Check if stderr is not empty and auto-debugging is enabled
+      if (errorMessage.trim() !== "" && autoDebugging.value) {
+
+        // Check if it's a ModuleNotFoundError
+        const missingModuleMatch = errorMessage.match(/ModuleNotFoundError: No module named '(.+?)'/);
+        if (missingModuleMatch) {
+          const missingModule = missingModuleMatch[1];
+          const userConfirmed = window.confirm(`The module "${missingModule}" is missing. Do you want to install it?`);
+          if (userConfirmed) {
+            // Call the API to install the missing module and then re-run the script
+            // You'll need to create an endpoint to handle this installation
+            const installResponse = await fetch(`http://127.0.0.1:8081/install_module`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ module_name: missingModule })
+            });
+
+            if (!installResponse.ok) {
+              addSysMessage("Failed to install the missing module. Please try again.");
+            } else {
+              // Re-run the code after installing the missing module
+              extractCodeAndRun(code);
+            }
+          }
+        } else {
+          // If there's an error, set the state to 'error'
+          codeBlockExecutionStates.set(code, 'error');
+          failedScriptsCount.value += 1;
+          // Prompt the model with the error message
+          chat("I executed the code you provided me and it yielded an exception-- you'll find the error below, please provide the fixed code:\n" + extractErrorMessage(errorMessage));
+          return;
+        }
+      } else if (errorMessage.trim() !== "") {
+        // If there's an error, set the state to 'error'
+        codeBlockExecutionStates.set(code, 'error');
+        failedScriptsCount.value += 1;
+        console.error("Python execution error:", errorMessage);
+      } else {
+        // If no error, set the state to 'success'
+        codeBlockExecutionStates.set(code, 'success');
+        console.log("Python execution successful");
+        successfulScriptsCount.value += 1; // Increment the count of successful scripts
+      }
+
+      // Log the result
+      console.log("" + data);
+      return data;
+    }
+
+
+    const copyToClipboard = (text) => {
+      console.log("copyButton clicked" + text);
+      const textArea = document.createElement('textarea');
+      textArea.value = text;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textArea);
+      alert('Code copied to clipboard!');
+    }
+
+    // simple template replace
+    const template = (str, extraSettings) => {
+      let settings = session.value;
+      if (extraSettings) {
+        settings = { ...settings, ...extraSettings };
+      }
+      return String(str).replaceAll(/\{\{(.*?)\}\}/g, (_, key) => template(settings[key]));
+    }
+
+    // send message to server
+    async function processChat() {
+      const prompt = template(session.value.template, {
+        history: session.value.transcript.flatMap(([name, message]) => template(session.value.historyTemplate, { name, message })).join("\n"),
+      });
+
+      console.log("Prompt:", prompt);
+
+
+      let currentMessage = '';
+      const history = session.value.transcript;
+
+      const llamaParams = {
+        ...params.value,
+        stop: ["</s>", template("{{char}}:"), template("{{user}}:")],
+      }
+
+      for await (const chunk of llama(prompt, llamaParams, { controller: controller.value })) {
+        const data = chunk.data;
+        currentMessage += data.content;
+
+        // remove leading whitespace
+        currentMessage = currentMessage.replace(/^\s+/, "")
+
+        transcriptUpdate([...history, ["{{char}}", currentMessage]])
+
+        if (data.stop) {
+          console.log("Completion finished: '", currentMessage, "', summary: ", data);
+        }
+
+        if (data.timings) {
+          llamaStats.value = data.timings;
+        }
+      }
+
+      return currentMessage;
+    }
+
+    const chat = async (msg) => {
+
+      // reset the sys msg
+      session.value.prompt = ogPrompt;
+
+      if (controller.value) {
+        console.log('already running...');
+        return;
+      }
+
+      controller.value = new AbortController();
+
+      let fileSample = '';
+
+
+      isSpinning.value = true;  // Start spinning before completion
+
+
+      let filePath = msg.match(FILE_PATH_REGEX);
+      if (filePath && filePath.length > 0) {
+        filePath = filePath[0];
+        try {
+          const options = {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ filepath: filePath })
+          };
+          const fileSampleResponse = await fetch(`http://127.0.0.1:8081/read_file_sample`, options);
+          if (!fileSampleResponse.ok) {
+            throw new Error(`Failed to fetch file sample for path ${filePath}`);
+          }
+          const fileSampleJSON = await fileSampleResponse.json();
+          fileSample = `\n\nHere is a small sample from the file provided by the user: \n (sampleStart) \n ${fileSampleJSON.sample_data} \n (sampleEnd)`;
+          session.value.prompt += fileSample;
+        } catch (error) {
+          console.error("Error fetching file sample:", error);
+          session.value.prompt += "\n\nError reading the specified file.";
+        }
+      }
+
+      transcriptUpdate([...session.value.transcript, ["{{user}}", msg]])
+
+      const currentMessage = await processChat(fileSample);
+
+      isSpinning.value = false;  // Stop spinning after completion
+
+      const codeBlockRegex = /```python([^]*?)```/g;
+      const matches = currentMessage.match(codeBlockRegex);
+      if (matches && matches.length > 0 && autoRun.value) {
+        const code = matches[0].replace(/```python/g, '').replace(/```/g, '').trim();
+        extractCodeAndRun(code);
+      }
+
+      controller.value = null;
+    }
+
+    function extractErrorMessage(stacktrace) {
+      // Find all lines that have the format "File ..."
+      const matches = [...stacktrace.matchAll(/File ".+", line \d+/g)];
+
+      // If there are no matches, return the full stacktrace
+      if (matches.length === 0) {
+        return stacktrace;
+      }
+
+      // Get the last "File ..." line
+      const lastMatch = matches[matches.length - 1][0];
+
+      // Find the start index of the last "File ..." line in the stacktrace
+      const startIdx = stacktrace.lastIndexOf(lastMatch);
+
+      // Get the error message that appears after the last "File ..." line
+      const errorMessage = stacktrace.substring(startIdx + lastMatch.length).trim();
+
+      return errorMessage;
+    }
+
+    function Toggles() {
+      const toggleAutoDebugging = () => {
+        autoDebugging.value = !autoDebugging.value;
+        console.log("toggleAutoDebugging enabled:" + autoDebugging.value);
+      }
+
+      const toggleAutoRun = () => {
+        autoRun.value = !autoRun.value;
+        console.log("toggleAutoRun enabled:" + autoRun.value);
+      }
+
+      return html`
+            <div class="toggles">
+                <label>
+                    <input type="checkbox" checked=${autoDebugging.value} onchange=${toggleAutoDebugging} />
+                    Auto-Debug
+                </label>
+                <label>
+                    <input type="checkbox" checked=${autoRun.value} onchange=${toggleAutoRun} />
+                    Auto-Run  
+                </label>
+            </div>
+        `;
+    }
+    const renderCodeBlocks = () => {
+      document.querySelectorAll('pre code.language-python').forEach((codeBlock) => {
+        const codeContent = codeBlock.textContent;
+        const executionState = codeBlockExecutionStates.get(codeContent);
+        if (executionState) {
+          codeBlock.classList.remove('success', 'error', 'not_executed');
+          codeBlock.classList.add(executionState);
+        }
+      });
+    };
+
+    function simpleDiff(a, b) {
+      const linesA = a.split('\n');
+      const linesB = b.split('\n');
+      const maxLength = Math.max(linesA.length, linesB.length);
+      let diffResult = '';
+
+      for (let i = 0; i < maxLength; i++) {
+        if (linesA[i] !== linesB[i]) {
+          if (linesA[i]) {
+            diffResult += `<span class="deletion">- ${linesA[i]}</span>\n`;
+          }
+          if (linesB[i]) {
+            diffResult += `<span class="addition">+ ${linesB[i]}</span>\n`;
+          }
+        } else {
+          diffResult += `  ${linesA[i] || ''}\n`;
+        }
+      }
+      return diffResult;
+    }
+
+    // // Sample code to add a new chat to the carousel
+    // function addChatToCarousel(chatName) {
+    //   const carousel = document.querySelector('.carousel-container');
+    //   const newChatCard = document.createElement('div');
+    //   newChatCard.classList.add('chat-card');
+    //   newChatCard.textContent = chatName;
+    //   carousel.appendChild(newChatCard);
+    // }
+
+    function MessageInput() {
+      const message = useSignal("")
+
+      const random = (e) => {
+        e.preventDefault();
+        if (promptsArray.length > 0) {
+          const randomPrompt = promptsArray[Math.floor(Math.random() * promptsArray.length)];
+          session.value.prompt += '\n' + randomPrompt;
+          chat(randomPrompt); // Trigger a chat session with the random prompt
+        } else {
+          console.error("No prompts available");
+        }
+      }
+
+      const stop = (e) => {
+        isSpinning.value = false;
+        e.preventDefault();
+        if (controller.value) {
+          controller.value.abort();
+          controller.value = null;
+        }
+      }
+
+      const reset = (e) => {
+        stop(e);
+        transcriptUpdate([]);
+      }
+
+      const submit = (e) => {
+        stop(e);
+        chat(message.value);
+        message.value = "";
+      }
+
+      const enterSubmits = (event) => {
+        if (event.which === 13 && !event.shiftKey) {
+          submit(event);
+        }
+      }
+
+      return html`
+          <form onsubmit=${submit}>
+              <div>
+                  <textarea id="inputarea" type="text" rows=2 onkeypress=${enterSubmits} value="${message}" oninput=${(e) => message.value = e.target.value} style="box-shadow: 1px -4px 20px 4px rgba(0, 0, 0, 0.2); background: aliceblue; color: black;
+    font-family: monospace;" placeholder="Say something..."/>
+              </div>
+              <div class="right">
+                  <button button id="sendButton" style="width: 40px;" type="submit" disabled=${!generating.value}>
+                      <i class="rotate-icon fas fa-paper-plane"></i>  <!-- Send icon -->
+                  </button>
+                  <button id="randomizeButton" style="width: 40px;" onclick=${random} disabled=${!generating.value}>
+                      <i class="fas fa-random"></i>  <!-- Rand icon -->
+                  </button>
+                  <button id="stopButton" style="width: 40px; margin-left: 1px;" onclick=${stop} disabled=${generating}>
+                      <i class="fas fa-stop"></i>  <!-- Stop icon -->
+                  </button>
+                  <button id="resetButton" style="margin-left: -2px; width: 40px;" onclick=${reset}>
+                      <i class="fas fa-redo"></i>  <!-- Reset icon -->
+                  </button>
+              </div>
+          </form>
+      `;
+    }
+
+    // Load prompts from the text file into the array when the page loads
+    window.onload = async () => {
+      try {
+        const response = await fetch('./assets/data/random_prompts.txt'); // Set the correct path
+        const data = await response.text();
+        promptsArray = data.split('\n');
+      } catch (error) {
+        console.error("Error loading prompts:", error);
+      }
+    };
+    const ChatLog = (props) => {
+      const messages = session.value.transcript;
+
+
+      const container = useRef(null)
+
+      useEffect(() => {
+        // Ensure chat container is scrolled to the bottom
+        if (container.current) {
+          container.current.scrollTop = container.current.scrollHeight;
+        }
+      }, [messages]);
+
+      const chatLine = ([user, msg]) => {
+        console.log("user is:" + user);
+        let userClass = template(user) === 'User' ? 'user' : 'char';
+        return html`<p key=${msg} class="${userClass}"><${Markdownish} text=${template(msg)} /></p>`
+      };
+
+      return html`
+            <section id="chat" ref=${container}>
+              ${messages.flatMap(chatLine)}
+            </section>`;
+    };
+
+    const ConfigForm = (props) => {
+      const updateSession = (el) => session.value = { ...session.value, [el.target.name]: el.target.value }
+      const updateParams = (el) => params.value = { ...params.value, [el.target.name]: el.target.value }
+      const updateParamsFloat = (el) => params.value = { ...params.value, [el.target.name]: parseFloat(el.target.value) }
+      const updateParamsInt = (el) => params.value = { ...params.value, [el.target.name]: Math.floor(parseFloat(el.target.value)) }
+
+      const FloatField = ({ label, max, min, name, step, value }) => {
+        return html`
+            <div>
+              <label for="${name}">${label}</label>
+              <input type="range" id="${name}" min="${min}" max="${max}" step="${step}" name="${name}" value="${value}" oninput=${updateParamsFloat} />
+              <span>${value}</span>
+            </div>
+          `
+      };
+
+      const IntField = ({ label, max, min, name, value }) => {
+        return html`
+            <div>
+              <label for="${name}">${label}</label>
+              <input type="range" id="${name}" min="${min}" max="${max}" name="${name}" value="${value}" oninput=${updateParamsInt} />
+              <span>${value}</span>
+            </div>
+          `
+      };
+
+      return html`
+          <form style="text-align: -webkit-center;">
+            <fieldset>
+              <div>
+                <label for="prompt">- sys -</label>
+                <textarea type="text" name="prompt" value="${session.value.prompt}" rows=4 oninput=${updateSession}/>
+              </div>
+            </fieldset>
+
+            <fieldset class="two">
+              <div>
+                <label for="user">- user -</label>
+                <input type="text" name="user" value="${session.value.user}" oninput=${updateSession} style=" padding: 4px; border-radius: 8px; background: rgba(3, 20, 130, 0.44)"/>
+              </div>
+
+              <div>
+                <label for="bot">- llm -</label>
+                <input type="text" name="char" value="${session.value.char}" oninput=${updateSession} style=" padding: 4px; border-radius: 8px;background: rgb(156 0 146 / 55%)"/>
+              </div>
+            </fieldset>
+
+            <fieldset>
+              <div>
+                <label for="template">- template -</label>
+                <textarea id="template" name="template" value="${session.value.template}" rows=4 oninput=${updateSession}/>
+              </div>
+
+              <div>
+                <label for="template">- history template -</label>
+                <textarea id="template" name="historyTemplate" value="${session.value.historyTemplate}" rows=1 oninput=${updateSession}/>
+              </div>
+            </fieldset>
+
+            <fieldset class="two">
+              ${IntField({ label: "Predictions", max: 2048, min: -1, name: "n_predict", value: params.value.n_predict })}
+              ${FloatField({ label: "Temperature", max: 1.5, min: 0.0, name: "temperature", step: 0.01, value: params.value.temperature })}
+              ${FloatField({ label: "Penalize repeat sequence", max: 2.0, min: 0.0, name: "repeat_penalty", step: 0.01, value: params.value.repeat_penalty })}
+              ${IntField({ label: "Consider N tokens for penalize", max: 2048, min: 0, name: "repeat_last_n", value: params.value.repeat_last_n })}
+              ${IntField({ label: "Top-K sampling", max: 100, min: -1, name: "top_k", value: params.value.top_k })}
+              ${FloatField({ label: "Top-P sampling", max: 1.0, min: 0.0, name: "top_p", step: 0.01, value: params.value.top_p })}
+            </fieldset>
+            <details>
+              <summary>More options</summary>
+              <fieldset class="two">
+                ${FloatField({ label: "TFS-Z", max: 1.0, min: 0.0, name: "tfs_z", step: 0.01, value: params.value.tfs_z })}
+                ${FloatField({ label: "Typical P", max: 1.0, min: 0.0, name: "typical_p", step: 0.01, value: params.value.typical_p })}
+                ${FloatField({ label: "Presence penalty", max: 1.0, min: 0.0, name: "presence_penalty", step: 0.01, value: params.value.presence_penalty })}
+                ${FloatField({ label: "Frequency penalty", max: 1.0, min: 0.0, name: "frequency_penalty", step: 0.01, value: params.value.frequency_penalty })}
+              </fieldset>
+              <hr />
+              <fieldset class="three">
+                <div>
+                  <label><input type="radio" name="mirostat" value="0" checked=${params.value.mirostat == 0} oninput=${updateParamsInt} /> no Mirostat</label>
+                  <label><input type="radio" name="mirostat" value="1" checked=${params.value.mirostat == 1} oninput=${updateParamsInt} /> Mirostat v1</label>
+                  <label><input type="radio" name="mirostat" value="2" checked=${params.value.mirostat == 2} oninput=${updateParamsInt} /> Mirostat v2</label>
+                </div>
+                ${FloatField({ label: "Mirostat tau", max: 10.0, min: 0.0, name: "mirostat_tau", step: 0.01, value: params.value.mirostat_tau })}
+                ${FloatField({ label: "Mirostat eta", max: 1.0, min: 0.0, name: "mirostat_eta", step: 0.01, value: params.value.mirostat_eta })}
+              </fieldset>
+            </details>
+          </form>
+        `
+    }
+
+    const Markdownish = (params) => {
+
+      const codeBlockRegex = /```python([^]*?)```/g;
+
+      const placeholders = [];
+      const placeholderText = 'CODEBLOCKPLACEHOLDER';
+
+      let md = params.text
+        .replace(codeBlockRegex, (match, p1) => {
+          placeholders.push(p1);
+          return placeholderText;
+        })
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/^#{1,6} (.*)$/gim, '<h3>$1</h3>')
+        .replace(/\*\*([^*]*?)\*\*/g, '<strong>$1</strong>')
+        .replace(/__(__)*?__/g, '<strong>$1</strong>')
+        .replace(/\*([^*]*?)\*/g, '<em>$1</em>')
+        .replace(/_([^_]*?)_/g, '<em>$1</em>')
+        .replace(/`([^`]*?)`/g, '<code>$1</code>')
+        .replace(/\n/gim, '<br />');
+
+      placeholders.forEach((code, i) => {
+
+        // Normalize whitespace 
+        const normalizedCode = code.normalize();
+
+        // Highlight code
+        const highlightedCode = Prism.highlight(normalizedCode, Prism.languages.python, 'python');
+
+        // Determine the class based on the state
+        let codeClass = codeBlockExecutionStates.get(code) || 'not_executed';
+
+        md = md.replace(placeholderText, `
+          <div class="codeblock-container">
+            <pre id="codeblock">
+              <code class="language-python ${codeClass}">${highlightedCode}</code>
+                <input type="checkbox" class="codeblock-checkbox" />
+                <button class="copyButton" data-toggle="tooltip" data-placement="top" title="Tooltip on top">
+                  <i class="fas fa-copy"></i>
+                </button>
+                <button class="saveButton" data-toggle="tooltip" data-placement="top" title="Tooltip on top">
+                  <i class="fas fa-save"></i>
+                </button>
+                <button class="runButton" data-toggle="tooltip" data-placement="top" title="Tooltip on top">
+                  <i class="fas fa-play"></i>
+                </button>
+                <button class="diffButton" data-toggle="tooltip" data-placement="top" title="Tooltip on top">
+                  <i class="fas fa-exchange-alt"></i>
+                </button>
+                <button class="editButton" data-toggle="tooltip" data-placement="top" title="Tooltip on top">
+                  <i class="fas fa-edit"></i>
+                </button>
+              </pre>
+            </div>
+          `);
+      });
+
+      return html`<span dangerouslySetInnerHTML=${{ __html: md }} />`;
+
+    };
+
+    // Function to show the difference overlay
+    function showDiffOverlay() {
+      let overlay = document.getElementById("diff-overlay");
+      overlay.classList.remove("flyOutToBottom");
+      overlay.classList.add("flyInFromBottom");
+
+      // New - add dimmed background
+      document.body.style.backgroundColor = "rgba(0,0,0,0.5)";
+
+      overlay.style.display = 'block';
+      document.getElementById('diff-content').classList.add('visible');
+    }
+
+    // Function to hide the difference overlay
+    function hideDiffOverlay() {
+      let overlay = document.getElementById("diff-overlay");
+      overlay.classList.remove("flyInFromBottom");
+      overlay.classList.add("flyOutToBottom");
+
+      // New - remove dimmed background 
+      document.body.style.backgroundColor = "";
+
+      setTimeout(() => {
+        overlay.style.display = "none";
+      }, 500);
+    }
+    function toggleEditMode(event) {
+      const codeBlock = event.target.closest('pre').querySelector('.language-python');
+
+      if (codeBlock.contentEditable === "true") {
+        codeBlock.contentEditable = "false";
+      } else {
+        codeBlock.contentEditable = "true";
+      }
+    }
+
+    document.addEventListener('click', (event) => {
+      console.log("click");
+      if (event.target.matches('.copyButton') || event.target.matches('.copyButton i')) {
+        console.log("click copyButton");
+        const codeBlock = event.target.closest('pre').querySelector('.language-python').textContent;
+        copyToClipboard(codeBlock);
+        alert('Code copied to clipboard!');
+      } else if (event.target.matches('.runButton') || event.target.matches('.runButton i')) {
+        console.log("click runButton");
+        // Correctly extract the code from the code block associated with the clicked button
+        const code = event.target.closest('pre').querySelector('.language-python').textContent;
+        extractCodeAndRun(code);
+      }
+      else if (event.target.matches('#diff-close')) {
+        hideDiffOverlay();
+      }
+      else if (event.target.matches('.editButton') || event.target.matches('.editButton i')) {
+        toggleEditMode(event);
+      }
+      else if (event.target.matches('.saveButton') || event.target.matches('.saveButton i')) {
+        const codeBlock = event.target.closest('pre').querySelector('.language-python');
+
+        // Apply the animation
+        codeBlock.classList.add('shrink-and-toss');
+
+        setTimeout(() => {
+          codeBlock.classList.remove('shrink-and-toss');
+          codeBlock.style.transform = '';  // Reset the transform to its original state
+          const code = codeBlock.textContent;
+          saveScript(code);
+        }, 1000);  // Assuming the animation duration is 1s (1000ms)
+      }
+      else if (event.target.matches('.diffButton') || event.target.matches('.diffButton i')) {
+        const selectedCodeBlocks = document.querySelectorAll('.codeblock-checkbox:checked');
+        if (selectedCodeBlocks.length !== 2) {
+          alert('Please select exactly two code blocks to compare.');
+          return;
+        }
+
+        const codeA = selectedCodeBlocks[0].parentElement.querySelector('.language-python').textContent;
+        const codeB = selectedCodeBlocks[1].parentElement.querySelector('.language-python').textContent;
+
+
+        const diffResult = simpleDiff(codeA, codeB);
+        document.getElementById('diff-result').innerHTML = diffResult;
+        // Use the function to show the overlay
+        showDiffOverlay();
+      }
+    });
+
+    const ModelGenerationInfo = (params) => {
+      if (!llamaStats.value) {
+        return html`<span/>`
+      }
+
+      console.log(llamaStats.value.predicted_per_second);
+
+      // get the tokens per second value
+      let tokensPerSecond = llamaStats.value.predicted_per_second.toFixed(2);
+
+      // set the default highlight class as red
+      let highlightClass = 'redHighlight';
+
+      // check the tokens per second value and set the highlight class accordingly
+      if (tokensPerSecond >= 30) {
+        highlightClass = 'greenHighlight';
+      } else if (tokensPerSecond >= 20 && tokensPerSecond < 30) {
+        highlightClass = 'yellowHighlight';
+      }
+      
+
+      return html`
+          <span>
+            <span class=${highlightClass}>${llamaStats.value.predicted_per_token_ms.toFixed()}ms</span> per token,
+            <span class=${highlightClass}>${tokensPerSecond} tokens</span> per second
+          </span>
+        `
+    }
+    function App(props) {
+
+      const logoClass = isSpinning.value ? 'spinning' : '';
+
+      return html`
+        <div id="score-container-left">
+            <span>Good runs: ${successfulScriptsCount.value}</span>
+        </div>
+        <div id="score-container-right">
+            <span>Bad runs: ${failedScriptsCount.value}</span>
+        </div>
+        <div id="diff-overlay">
+          <div id="diff-content">
+            <span id="diff-close">x</span>
+            <pre id="diff-result"></pre>
+          </div>
+        </div>
+          <div id="container">
+            <header>
+              <h1 id="title" style="color: rgb(0, 0, 0); animation: flyInFromLeft 1.2s cubic-bezier(0.4, 0, 1, 1); letter-spacing: 2; text-align: center; text-shadow: -1px 2px 8px #973a10; margin-top: 16px; font-family: 'Sunny Spells', fallbackFont, sans-serif;">Baby 🦙 Code <span id="logo" class=${logoClass}>🐍</span> Interpreter</h1>
+            </header>
+            <main id="content">
+              <${chatStarted.value ? ChatLog : ConfigForm} />
+            </main>
+            <${Toggles} />
+            <section id="write">
+              <${MessageInput} />
+            </section>
+
+            <footer>
+              <p><${ModelGenerationInfo} /></p>
+              <p>Powered by <a href="https://github.com/ggerganov/llama.cpp">llama.cpp</a> and <a href="https://ggml.ai">ggml.ai</a>.</p>
+            </footer>
+          </div>
+        `;
+    }
+
+    render(h(App), document.body);
+
+  </script>
+</head>
+
+</html>
