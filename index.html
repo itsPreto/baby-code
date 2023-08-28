@@ -303,10 +303,10 @@
 
       isSpinning.value = false;  // Stop spinning after completion
 
-      const codeBlockRegex = /```python([^]*?)```/g;
+      const codeBlockRegex = /`python([^]*?)`/g;
       const matches = currentMessage.match(codeBlockRegex);
       if (matches && matches.length > 0 && autoRun.value) {
-        const code = matches[0].replace(/```python/g, '').replace(/```/g, '').trim();
+        const code = matches[0].replace(/`python/g, '').replace(/`/g, '').trim();
         extractCodeAndRun(code);
       }
 

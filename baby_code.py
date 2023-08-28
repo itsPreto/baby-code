@@ -116,7 +116,7 @@ def install_dependency(module_name):
     Returns:
     - Status message indicating the result of the installation.
     """
-    process = subprocess.Popen(["pip3.11", "install", module_name],
+    process = subprocess.Popen(["pip", "install", module_name],
                                stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = process.communicate()
     if process.returncode == 0:
@@ -127,7 +127,7 @@ def install_dependency(module_name):
 
 
 def execute(code):
-    process = subprocess.Popen(["./venv/bin/python3.11", "-c", code],
+    process = subprocess.Popen(["python3", "-c", code],
                                stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = process.communicate()
     return stdout.decode(), stderr.decode()
@@ -402,8 +402,8 @@ def load_chat_session():
 if __name__ == '__main__':
     # Run the external command
     server_process = subprocess.Popen(
-        ["./server", "-m", "./models/wizardcoder-python-13b-v1.0.Q5_K_M.gguf", "-c", "2048",
-         "-ngl", "1", "--path", "./baby-code"])
+        ["./llama.cpp/server", "-m", "./llama.cpp/models/CodeLlama-7b-Python/codellama-7b-python.Q5_K_M.gguf", "-c", "4096",
+         "-ngl", "1", "--path", "."])
     # Pause for 5 seconds
     time.sleep(5)
     app.run(args.host, port=args.port)
