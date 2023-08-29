@@ -55,13 +55,11 @@ cd baby-code && pip install -r requirements.txt
 - You may also download any other models supported by llama.cpp, of any parameter size of your choosing.
 - Keep in mind that the paramters might need to be tuned for your specific case:
 
-## 🦙 !IMPORTANT! Build Llama.cpp
+## 🦙 ⚠️ IMPORTANT ⚠️ 
 
-- This project is a fork of `Llama.cpp` so it depends on a successful compilation.
+- This project is dependent on its submodule `llama.cpp` and relies on its successful build.
 
-- Depending on you OS you have a few options for compiling and building the Llama.cpp library.
-
-- Please refer to their original [build setup](https://github.com/ggerganov/llama.cpp#build)
+- Please refer to their original [build setup](https://github.com/ggerganov/llama.cpp#build) to setup on your specific OS.
 
 ## 🧠 Model Config
 Load up your chosen model `gguf` for local inference using CPU or GPU by simply placing it in the `llama.cpp/models` folder and edit the `baby_code.py` init config below:
