@@ -18,26 +18,21 @@ Leveraging open source Llama-based models and powered by llama.cpp, this service
 - 🧠 **_Model_**: Llama-2 (Only models compatible with Llama.cpp).
 
 ## Features
+- 🎊 Confetti every time you load the page:)
+- 💬 Contextual Conversations: Models are augmented with the chat context along the conversations to remember and refer back to previous parts of it, ensuring you have a coherent chat experience.
+- 🔄 Dynamic Code Interaction: Copy, Diff, Edit, Save and Run the generated Python scripts right from the chat.
+- 🐞 Auto-Debugging & 🏃 Auto-Run: Allow the model to automatically debug and re-run any attempts at fixing them on the fly (it will die on its sword trying).
+- 📊 Inference & Performance Metrics: Stay informed about how fast the model is processing your requests and rally the successful vs failed script executions.
+- ❓ Random Prompts: Not sure what to ask? Click the "Rand" button to randomly pick from a pre-defined prompt list!
 
-What's New? [(_see old archived repo_)](https://github.com/itsPreto/baby-code/blob/main/README.md)
-- 🚀 Performance Boost: By eliminating intermediary layers, the app runs faster and more reliably.\
-- 🎨 UI Overhaul: A more elegant and user-friendly design that feels different from any chat application you've used.
-- 💬 Contextual Conversations: The model can now remember and refer back to previous parts of the conversation, ensuring you have a coherent chat experience.
-- 🔄 Dynamic Code Interaction: Copy, run, or even compare differences between Python code blocks right from the chat.
-- 🐞 Auto-Debugging & 🏃 Auto-Run: Errors in the code? The chatbot will let you know. Want to run the code without clicking a button? It can do that too!
-- 📊 Inference Metrics: Stay informed about how fast the model is processing your requests.
-- 📊 Performance Metrics: Keep a tally of how many scripts run successfully vs how many don't.
-- ❓ Random Prompts: Not sure what to ask? Click the "Rand" button for a random prompt!
-- 📜 Code Diff Viewer: Select any two generated scripts to perform a fast diff between them.
-
-## 🚀 Setup
+## 🚀 Getting Started
 - Clone the repo:
 
 ```bash
 git clone https://github.com/itsPreto/baby-code
 ```
 
--  Navigate to the project:
+-  Navigate to the llama.cpp submodule:
 
 ```bash
 cd baby-code/llama.cpp
@@ -56,8 +51,7 @@ cd baby-code && pip install -r requirements.txt
 
 ## 💾 Model Download
 
-- With everything installed you just need a model.
-- The 7B Llama-2 based model [TheBloke/llama2-7b-chat-codeCherryPop-qLoRA-GGML](https://huggingface.co/TheBloke/llama2-7b-chat-codeCherryPop-qLoRA-GGML) is a model fine-tuned by [a kind redditor](https://www.reddit.com/r/LocalLLaMA/comments/156htzy/i_made_llama2_7b_into_a_really_useful_coder/)
+- The 7B Llama-2 based model [TheBloke/WizardCoder-Python-13B-V1.0-GGUF](https://huggingface.co/TheBloke/WizardCoder-Python-13B-V1.0-GGUF) is a model fine-tuned by [a kind redditor](https://www.reddit.com/r/LocalLLaMA/comments/156htzy/i_made_llama2_7b_into_a_really_useful_coder/)
 - You may also download any other models supported by llama.cpp, of any parameter size of your choosing.
 - Keep in mind that the paramters might need to be tuned for your specific case:
 
@@ -70,7 +64,7 @@ cd baby-code && pip install -r requirements.txt
 - Please refer to their original [build setup](https://github.com/ggerganov/llama.cpp#build)
 
 ## 🧠 Model Config
-Load up your chosen model `ggml` for local inference using CPU or GPU by simply placing it in the `\models` folder and edit the `baby_code.py` init config below:
+Load up your chosen model `gguf` for local inference using CPU or GPU by simply placing it in the `llama.cpp/models` folder and edit the `baby_code.py` init config below:
 
 ```python
 if __name__ == '__main__':
