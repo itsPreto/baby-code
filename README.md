@@ -82,7 +82,7 @@ In order to build llama.cpp you have three different options.
     cmake --build . --config Release
     ```
 
-### Build Alternatives [Metal](https://github.com/ggerganov/llama.cpp#intel-mkl), [Intel Mlk](https://github.com/ggerganov/llama.cpp#intel-mkl), [MPI](https://github.com/ggerganov/llama.cpp#mpi-build), [BLIS](https://github.com/ggerganov/llama.cpp/blob/master/docs/BLIS.md) [cuBLAS](https://github.com/ggerganov/llama.cpp#cublas), [clBLAST](https://github.com/ggerganov/llama.cpp#clblast), [OpenBLAS](https://github.com/ggerganov/llama.cpp#openblas), and [hipBLAS](https://github.com/ggerganov/llama.cpp#openblas).
+### Build Alternatives [Metal](https://github.com/ggerganov/llama.cpp#metal-build), [Intel Mlk](https://github.com/ggerganov/llama.cpp#intel-mkl), [MPI](https://github.com/ggerganov/llama.cpp#mpi-build), [BLIS](https://github.com/ggerganov/llama.cpp/blob/master/docs/BLIS.md) [cuBLAS](https://github.com/ggerganov/llama.cpp#cublas), [clBLAST](https://github.com/ggerganov/llama.cpp#clblast), [OpenBLAS](https://github.com/ggerganov/llama.cpp#openblas), and [hipBLAS](https://github.com/ggerganov/llama.cpp#openblas).
 
 ## 💾 Model Download
 
