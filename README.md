@@ -29,7 +29,7 @@ Leveraging (open source gguf models)[https://huggingface.co/models?search=gguf] 
 - Clone the repo:
 
 ```bash
-git clone https://github.com/itsPreto/baby-code
+git clone --recurse-submodules https://github.com/itsPreto/baby-code
 ```
 
 -  Navigate to the llama.cpp submodule:
