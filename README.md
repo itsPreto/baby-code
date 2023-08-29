@@ -22,7 +22,7 @@ Leveraging open source Llama-based models and powered by llama.cpp, this service
 - 💬 Contextual Conversations: Models are augmented with the chat context along the conversations to remember and refer back to previous parts of it, ensuring you have a coherent chat experience.
 - 🔄 Dynamic Code Interaction: Copy, Diff, Edit, Save and Run the generated Python scripts right from the chat.
 - 🐞 Auto-Debugging & 🏃 Auto-Run: Allow the model to automatically debug and re-run any attempts at fixing them on the fly (it will die on its sword trying).
-- 📊 Inference & Performance Metrics: Stay informed about how fast the model is processing your requests and rally the successful vs failed script executions.
+- 📊 Inference & Performance Metrics: Stay informed about how fast the model is processing your requests and tally the successful vs failed script executions.
 - ❓ Random Prompts: Not sure what to ask? Click the "Rand" button to randomly pick from a pre-defined prompt list!
 
 ## 🚀 Getting Started
