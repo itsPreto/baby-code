@@ -13,9 +13,9 @@ Leveraging open source Llama-based models and powered by llama.cpp, this service
 ## 🏗️ Architecture (in a nutshell)
 
 - 🖥️ **_Backend_**: Python Flask (CORS for serving both the API and the HTML).
-- 🌐 **_Frontend_**: HTML/JS/CSS (The UI was designed 100% to personal liking but open for changes).
-- ⚙️ **_Engine_**: Llama.cpp (Inference library for Llama/GGML models).
-- 🧠 **_Model_**: Llama-2 (Only models compatible with Llama.cpp).
+- 🌐 **_Frontend_**: HTML/JS/CSS (I'm not a frontend dev but gave it my best shot-- prolly tons of issues).
+- ⚙️ **_Engine_**: Llama.cpp: An inference library for `ggml/gguf` models).
+- 🧠 **_Model_**: (GGUF)[https://github.com/ggerganov/llama.cpp#description] format (replacing the retired `ggml` format).
 
 ## Features
 - 🎊 Confetti every time you load the page:)
