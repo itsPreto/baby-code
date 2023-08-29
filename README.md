@@ -8,14 +8,14 @@ A simple and 100% Local, Open-Source Code 🐍 Interpreter for 🦙 LLMs
 
 <img width="1685" alt="Screenshot 2023-08-13 at 1 44 53 PM" src="https://github.com/itsPreto/baby-llama.pycpp/assets/45348368/2dbec8a7-2ab9-448b-9441-92a841ba985a">
 
-Leveraging (open source gguf models)[https://huggingface.co/models?search=gguf] and powered by llama.cpp this project is a humble foundation for enabling LLMs to act as Code Interpreters.
+Leveraging [open source gguf models](https://huggingface.co/models?search=gguf) and powered by llama.cpp this project is a humble foundation for enabling LLMs to act as Code Interpreters.
 
 ## 🏗️ Architecture (in a nutshell)
 
 - 🖥️ **_Backend_**: Python Flask (CORS for serving both the API and the HTML).
 - 🌐 **_Frontend_**: HTML/JS/CSS (I'm not a frontend dev but gave it my best shot-- prolly tons of issues).
 - ⚙️ **_Engine_**: Llama.cpp: An inference library for `ggml/gguf` models).
-- 🧠 **_Model_**: (GGUF)[https://github.com/ggerganov/llama.cpp#description] format (replacing the retired `ggml` format).
+- 🧠 **_Model_**: [GGUF](https://github.com/ggerganov/llama.cpp#description) format (replacing the retired `ggml` format).
 
 ## 🦙 Features
 - 🎊 Confetti:3
