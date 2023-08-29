@@ -8,7 +8,7 @@ A simple and 100% Local, Open-Source Code 🐍 Interpreter for 🦙 LLMs
 
 <img width="1685" alt="Screenshot 2023-08-13 at 1 44 53 PM" src="https://github.com/itsPreto/baby-llama.pycpp/assets/45348368/2dbec8a7-2ab9-448b-9441-92a841ba985a">
 
-Leveraging open source Llama-based models and powered by llama.cpp, this service is exposed through a Flask server which receives user's requests, processes them, and returns Python code.
+Leveraging (open source gguf models)[https://huggingface.co/models?search=gguf] and powered by llama.cpp this project is a humble foundation for enabling LLMs to act as Code Interpreters.
 
 ## 🏗️ Architecture (in a nutshell)
 
@@ -17,11 +17,11 @@ Leveraging open source Llama-based models and powered by llama.cpp, this service
 - ⚙️ **_Engine_**: Llama.cpp: An inference library for `ggml/gguf` models).
 - 🧠 **_Model_**: (GGUF)[https://github.com/ggerganov/llama.cpp#description] format (replacing the retired `ggml` format).
 
-## Features
-- 🎊 Confetti every time you load the page:)
-- 💬 Contextual Conversations: Models are augmented with the chat context along the conversations to remember and refer back to previous parts of it, ensuring you have a coherent chat experience.
+## 🦙 Features
+- 🎊 Confetti:3
+- 💬 Contextual Conversations: Models are augmented with the ongoing context of the conversation-- allowing them to remember and refer back to previous parts of it.
 - 🔄 Dynamic Code Interaction: Copy, Diff, Edit, Save and Run the generated Python scripts right from the chat.
-- 🐞 Auto-Debugging & 🏃 Auto-Run: Allow the model to automatically debug and re-run any attempts at fixing them on the fly (it will die on its sword trying).
+- 🐞 Auto-Debugging & 🏃 Auto-Run: Allow the model to automatically debug and execute any attempts at fixing issue on the fly (_it will die trying_).
 - 📊 Inference & Performance Metrics: Stay informed about how fast the model is processing your requests and tally the successful vs failed script executions.
 - ❓ Random Prompts: Not sure what to ask? Click the "Rand" button to randomly pick from a pre-defined prompt list!
 
@@ -55,7 +55,7 @@ cd baby-code && pip install -r requirements.txt
 - You may also download any other models supported by llama.cpp, of any parameter size of your choosing.
 - Keep in mind that the paramters might need to be tuned for your specific case:
 
-## 🦙 ⚠️ IMPORTANT ⚠️ 
+## ⚠️ IMPORTANT ⚠️ 
 
 - This project is dependent on its submodule `llama.cpp` and relies on its successful build.
 
