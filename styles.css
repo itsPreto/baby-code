@@ -727,8 +727,8 @@ code.language-python {
 p.user {
     background: #0088ff;
     text-align: start;
-    word-wrap: break-word;
     margin-left:14px;
+    overflow-wrap: anywhere;
     margin-top: 20px;
     margin-bottom: 20px;
     margin-right:14px;
