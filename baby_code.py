@@ -4,6 +4,7 @@ import subprocess
 import time
 import argparse
 import csv
+import webbrowser
 import magic
 from flask import Flask, request, jsonify
 from flask_cors import CORS
@@ -23,39 +24,24 @@ from memory.chat_session import ChatSession
 app = Flask(__name__)
 CORS(app)
 
-TEXT_EXTENSIONS = ['.txt', '.md', '.csv', '.tsv', '.log', '.json', '.xml',
-                   '.yml', '.yaml', '.ini', '.conf']
-CODE_EXTENSIONS = ['.py', '.js', '.html', '.css', '.c', '.cpp', '.java', '.sh',
-                   '.bat']
-DATA_EXTENSIONS = ['.csv', '.json', '.xls', '.xlsx', '.xml', '.sql', '.db',
-                   '.h5', '.pkl']
-IMAGE_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.tiff', '.ico',
-                    '.svg']
-DOCUMENT_EXTENSIONS = ['.pdf', '.doc', '.docx', '.ppt', '.pptx', '.odt', '.ods',
-                       '.rtf']
+TEXT_EXTENSIONS = ['.txt', '.md', '.csv', '.tsv', '.log', '.json', '.xml','.yml', '.yaml', '.ini', '.conf']
+CODE_EXTENSIONS = ['.py', '.js', '.html', '.css', '.c', '.cpp', '.java', '.sh','.bat']
+DATA_EXTENSIONS = ['.csv', '.json', '.xls', '.xlsx', '.xml', '.sql', '.db', '.h5', '.pkl']
+IMAGE_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.tiff', '.ico','.svg']
+DOCUMENT_EXTENSIONS = ['.pdf', '.doc', '.docx', '.ppt', '.pptx', '.odt', '.ods','.rtf']
 AUDIO_EXTENSIONS = ['.mp3', '.wav', '.ogg', '.flac', '.m4a', '.aac']
 VIDEO_EXTENSIONS = ['.mp4', '.avi', '.mkv', '.flv', '.mov', '.wmv', '.webm']
 ARCHIVE_EXTENSIONS = ['.zip', '.tar', '.gz', '.rar', '.7z', '.bz2']
 OTHER_EXTENSIONS = ['.iso', '.img']
 
-parser = argparse.ArgumentParser(
-    description="An example of using server.cpp with a similar API to OAI. It must be "
-                "used together with server.cpp.")
-parser.add_argument("--stop", type=str,
-                    help="the end of response in chat completions(default: '</s>')",
-                    default="</s>")
-parser.add_argument("--llama-api", type=str,
-                    help="Set the address of server.cpp in llama.cpp(default: "
-                         "http://127.0.0.1:8080)",
-                    default='http://127.0.0.1:8080')
-parser.add_argument("--api-key", type=str,
-                    help="Set the api key to allow only few user(default: NULL)",
-                    default="")
-parser.add_argument("--host", type=str,
-                    help="Set the ip address to listen.(default: 127.0.0.1)",
-                    default='127.0.0.1')
-parser.add_argument("--port", type=int,
-                    help="Set the port to listen.(default: 8081)", default=8081)
+parser = argparse.ArgumentParser( description="An example of using server.cpp with a similar API to OAI. It must be used together with server.cpp.")
+
+parser.add_argument("--stop", type=str, help="the end of response in chat completions(default: '</s>')", default="</s>")
+parser.add_argument("--llama-api", type=str, help="Set the address of server.cpp in llama.cpp(default: http://127.0.0.1:8080)", default='http://127.0.0.1:8080')
+parser.add_argument("--api-key", type=str, help="Set the api key to allow only few user(default: NULL)", default="")
+parser.add_argument("--host", type=str, help="Set the ip address to listen.(default: 127.0.0.1)", default='127.0.0.1')
+parser.add_argument("--model_path", type=str, help="Set the port to listen.(default: 8081)", default="./llama.cpp/models/CodeLlama-7b-Python/codellama-7b-python.Q5_K_M.gguf")
+parser.add_argument("--port", type=int, help="Set the port to listen.(default: 8081)", default=8081)
 
 args = parser.parse_args()
 
@@ -400,10 +386,9 @@ def load_chat_session():
 
 
 if __name__ == '__main__':
-    # Run the external command
-    server_process = subprocess.Popen(
-        ["./llama.cpp/server", "-m", "./llama.cpp/models/CodeLlama-7b-Python/codellama-7b-python.Q5_K_M.gguf", "-c", "4096",
-         "-ngl", "1", "--path", "."])
+    # Run the server.cpp as a subprocess
+    server_process = subprocess.Popen(["./llama.cpp/server", "-m", args.model_path, "-c", "4096", "-ngl", "1", "--path", "."])
+    webbrowser.open(args.llama_api)
     # Pause for 5 seconds
     time.sleep(5)
     app.run(args.host, port=args.port)

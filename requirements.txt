@@ -3,7 +3,7 @@ flask-cors==4.0.0
 pandas==2.0.3
 zipfile36==0.1.3
 pydub==0.25.1
-numpy==1.25.2
+numpy==1.24
 moviepy==1.0.3
 PyPDF2==3.0.1
 python-docx==0.8.11
@@ -14,3 +14,4 @@ black~=22.8.0
 requests~=2.31.0
 matplotlib~=3.3.4
 Pillow>=9.2.0
+gguf>=0.1.0
